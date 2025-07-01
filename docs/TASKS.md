@@ -1,12 +1,34 @@
 # Tree Care App - TDD Development Tasks
 
+## Progress Summary
+- **Started**: July 1, 2025
+- **Current Phase**: 1.1 Development Environment Setup
+- **Repository**: https://github.com/ryandarton/tree-care-app
+- **Completed Tasks**: 2/5 in Phase 1.1
+
+## Key Findings & Decisions
+1. **AWS Configuration**: Using profile `ryan-laptop-goal-app` in region `us-east-2`
+2. **Dependency Management**: Using `--legacy-peer-deps` for all npm installs due to React version conflicts
+3. **Package Fixes**:
+   - `react-native-image-editor` → `@react-native-community/image-editor@^2.3.0`
+   - `react-native-image-resizer` → version `^1.4.5` (not 3.0.0)
+4. **Project Structure**: Created minimal `backend/` and `ai-models/` directories for npm workspaces
+
 ## Overview
 This document outlines the complete Test-Driven Development (TDD) approach for building the Tree Care App from concept to deployment. Each task follows the Red-Green-Refactor cycle with frequent commits.
 
 ## TDD Workflow for Every Task
 ```
-1. Write Test (Red) → 2. Run Test (Fail) → 3. Write Code → 4. Run Test (Pass) → 5. Refactor → 6. Commit
+1. Write Test (Red) → 2. Run Test (Fail) → 3. Write Code → 4. Run Test (Pass) → 5. Refactor → 6. Review Docs → 7. Commit
 ```
+
+## Documentation Review Process
+Before each commit:
+- [ ] Review relevant .md files in /docs
+- [ ] Update documentation with any structural changes
+- [ ] Document important findings or decisions
+- [ ] Ensure README reflects current state
+- [ ] Update CLAUDE.md if development workflow changes
 
 ## Commit Guidelines
 - Commit after each test passes
@@ -19,39 +41,49 @@ This document outlines the complete Test-Driven Development (TDD) approach for b
 ## Phase 1: Foundation & Infrastructure (Week 1-2)
 
 ### 1.1 Development Environment Setup
-- [ ] **TEST**: Write test for AWS CLI configuration validation
-- [ ] Configure AWS CLI with profile `ryan-laptop-goal-app`
-- [ ] **COMMIT**: "chore: configure AWS CLI profile"
-- [ ] **TEST**: Write test for project dependency installation
-- [ ] Fix npm dependency conflicts with legacy peer deps
-- [ ] **COMMIT**: "fix: resolve npm dependency conflicts"
+- [x] **TEST**: Write test for AWS CLI configuration validation
+- [x] Configure AWS CLI with profile `ryan-laptop-goal-app`
+- [x] **DOCS**: Review and update documentation
+- [x] **COMMIT**: "test: add AWS CLI configuration validation test"
+- [x] **TEST**: Write test for project dependency installation
+- [x] Fix npm dependency conflicts with legacy peer deps
+- [x] **DOCS**: Updated package.json with legacy-peer-deps, fixed package versions
+- [x] **COMMIT**: "fix: resolve npm dependency conflicts with legacy peer deps"
 - [ ] **TEST**: Write test for git hooks setup
 - [ ] Setup pre-commit hooks for linting and type checking
+- [ ] **DOCS**: Review and update documentation
 - [ ] **COMMIT**: "chore: add pre-commit hooks"
 
 ### 1.2 Testing Framework Setup
 - [ ] **TEST**: Write meta-test for Jest configuration
 - [ ] Configure Jest for backend with AWS SDK mocks
+- [ ] **DOCS**: Review and update documentation
 - [ ] **COMMIT**: "test: setup Jest for backend testing"
 - [ ] **TEST**: Write meta-test for React Native testing setup
 - [ ] Configure Jest and React Native Testing Library for mobile
+- [ ] **DOCS**: Review and update documentation
 - [ ] **COMMIT**: "test: setup mobile testing framework"
 - [ ] **TEST**: Write test for E2E framework initialization
 - [ ] Setup Detox for E2E testing
+- [ ] **DOCS**: Review and update documentation
 - [ ] **COMMIT**: "test: configure Detox E2E framework"
 
 ### 1.3 AWS Infrastructure as Code
 - [ ] **TEST**: Write CDK snapshot tests for stack configuration
 - [ ] Initialize AWS CDK project in infrastructure/
+- [ ] **DOCS**: Review and update documentation
 - [ ] **COMMIT**: "feat: initialize AWS CDK project"
 - [ ] **TEST**: Write tests for DynamoDB table schemas
 - [ ] Create DynamoDB tables (users, trees, photos, subscriptions)
+- [ ] **DOCS**: Review and update documentation
 - [ ] **COMMIT**: "feat: add DynamoDB table definitions"
 - [ ] **TEST**: Write tests for S3 bucket policies
 - [ ] Configure S3 buckets for photo storage with lifecycle rules
+- [ ] **DOCS**: Review and update documentation
 - [ ] **COMMIT**: "feat: configure S3 photo storage"
 - [ ] **TEST**: Write tests for Cognito user pool configuration
 - [ ] Setup Cognito user pools with MFA
+- [ ] **DOCS**: Review and update documentation
 - [ ] **COMMIT**: "feat: add Cognito authentication"
 
 ### 1.4 Backend API Foundation
@@ -355,7 +387,9 @@ This document outlines the complete Test-Driven Development (TDD) approach for b
 
 ## Notes
 - Each task should result in a commit within 2-4 hours of starting
+- Review and update documentation before EVERY commit
 - Run `npm run lint` and `npm run type-check` before every commit
 - Create feature branches for each major component
 - Squash commits when merging PRs
 - Tag releases after each phase completion
+- Keep Progress Summary and Key Findings sections updated
