@@ -12,6 +12,10 @@ yarn-error.log*
 .env.production
 .env.staging
 
+# Local Claude configuration
+CLAUDE.local.md
+.claude/
+
 # Build outputs
 dist/
 build/

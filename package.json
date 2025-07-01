@@ -17,9 +17,9 @@
   ],
   "scripts": {
     "claude": "claude --dangerously-skip-permissions",
-    "install-all": "npm install && npm run install:mobile && npm run install:backend",
-    "install:mobile": "cd mobile && npm install",
-    "install:backend": "cd backend && npm install",
+    "install-all": "npm install --legacy-peer-deps && npm run install:mobile && npm run install:backend",
+    "install:mobile": "cd mobile && npm install --legacy-peer-deps",
+    "install:backend": "cd backend && npm install --legacy-peer-deps",
     "dev": "concurrently \"npm run dev:mobile\" \"npm run dev:backend\"",
     "dev:mobile": "cd mobile && npm start",
     "dev:backend": "cd backend && npm run dev",
