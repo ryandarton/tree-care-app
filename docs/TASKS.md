@@ -22,6 +22,38 @@ This document outlines the complete Test-Driven Development (TDD) approach for b
 1. Write Test (Red) → 2. Run Test (Fail) → 3. Write Code → 4. Run Test (Pass) → 5. Refactor → 6. Review Docs → 7. Commit
 ```
 
+## Git Branching Strategy
+
+### Branch Structure
+```
+main                     # Stable, deployable code only
+├── feature/testing-framework      # Phase 1.2: Jest, React Native Testing, Detox
+├── feature/aws-infrastructure     # Phase 1.3: CDK, DynamoDB, S3, Cognito
+├── feature/backend-foundation     # Phase 1.4: Lambda, API Gateway, health checks
+├── feature/ci-cd-pipeline        # Phase 1.5: GitHub Actions workflows
+├── feature/mobile-foundation     # Phase 2: Redux, Navigation, UI Components
+├── feature/auth-flow            # Phase 2.4: Authentication screens and flow
+├── feature/ai-integration       # Phase 3: Photo analysis, ML models
+└── feature/monetization         # Phase 4: Stripe, ads, notifications
+```
+
+### Branching Workflow
+1. **Create feature branch**: `git checkout -b feature/branch-name`
+2. **Work in TDD cycles**: Test → Code → Commit (every 2-4 hours)
+3. **Push regularly**: Every 3-5 commits to backup work
+4. **PR when complete**: After completing major component/phase section
+5. **Merge to main**: Only after PR approval and all tests passing
+6. **Delete feature branch**: After successful merge
+
+### Merge Strategy
+- **Phase sections (1.1, 1.2, etc.)**: Feature branch → PR → Squash merge to main
+- **Major phases (Phase 1, 2, etc.)**: Create release tag after completion
+- **Hotfixes**: Direct to main with immediate PR for review
+
+### Branch Protection Rules
+- **main**: Requires PR approval, all tests passing, no direct pushes
+- **feature/***: Can push directly, regular backup pushes encouraged
+
 ## Documentation Review Process
 Before each commit:
 - [ ] Review relevant .md files in /docs
@@ -41,6 +73,7 @@ Before each commit:
 ## Phase 1: Foundation & Infrastructure (Week 1-2)
 
 ### 1.1 Development Environment Setup
+**Branch**: `main` (foundation setup)
 - [x] **TEST**: Write test for AWS CLI configuration validation
 - [x] Configure AWS CLI with profile `ryan-laptop-goal-app`
 - [x] **DOCS**: Review and update documentation
@@ -55,6 +88,9 @@ Before each commit:
 - [ ] **COMMIT**: "chore: add pre-commit hooks"
 
 ### 1.2 Testing Framework Setup
+**Branch**: `feature/testing-framework`
+- [ ] **BRANCH**: Create feature branch from main
+- [ ] **PR**: Submit PR to main when complete
 - [ ] **TEST**: Write meta-test for Jest configuration
 - [ ] Configure Jest for backend with AWS SDK mocks
 - [ ] **DOCS**: Review and update documentation
@@ -69,6 +105,9 @@ Before each commit:
 - [ ] **COMMIT**: "test: configure Detox E2E framework"
 
 ### 1.3 AWS Infrastructure as Code
+**Branch**: `feature/aws-infrastructure`
+- [ ] **BRANCH**: Create feature branch from main
+- [ ] **PR**: Submit PR to main when complete
 - [ ] **TEST**: Write CDK snapshot tests for stack configuration
 - [ ] Initialize AWS CDK project in infrastructure/
 - [ ] **DOCS**: Review and update documentation
@@ -87,6 +126,9 @@ Before each commit:
 - [ ] **COMMIT**: "feat: add Cognito authentication"
 
 ### 1.4 Backend API Foundation
+**Branch**: `feature/backend-foundation`
+- [ ] **BRANCH**: Create feature branch from main
+- [ ] **PR**: Submit PR to main when complete
 - [ ] **TEST**: Write tests for Lambda function handlers
 - [ ] Create Lambda function boilerplate with error handling
 - [ ] **COMMIT**: "feat: add Lambda function template"
@@ -98,12 +140,21 @@ Before each commit:
 - [ ] **COMMIT**: "feat: add health check endpoint"
 
 ### 1.5 CI/CD Pipeline
+**Branch**: `feature/ci-cd-pipeline`
+- [ ] **BRANCH**: Create feature branch from main
+- [ ] **PR**: Submit PR to main when complete
 - [ ] **TEST**: Write tests for GitHub Actions workflow
 - [ ] Create CI workflow for testing on push
 - [ ] **COMMIT**: "ci: add testing workflow"
 - [ ] **TEST**: Write tests for deployment validation
 - [ ] Create CD workflow for AWS deployment
 - [ ] **COMMIT**: "ci: add deployment workflow"
+
+### Phase 1 Completion
+- [ ] **MERGE**: All feature branches merged to main
+- [ ] **TAG**: Create release tag `v1.0.0-phase1`
+- [ ] **DEPLOY**: Deploy to development environment
+- [ ] **DOCS**: Update Progress Summary in TASKS.md
 
 ---
 
@@ -389,7 +440,14 @@ Before each commit:
 - Each task should result in a commit within 2-4 hours of starting
 - Review and update documentation before EVERY commit
 - Run `npm run lint` and `npm run type-check` before every commit
-- Create feature branches for each major component
-- Squash commits when merging PRs
-- Tag releases after each phase completion
+- **Branching**: Follow the documented Git strategy above
+- **PRs**: Required for all feature branch merges to main
+- **Tagging**: Create release tags after each phase completion
+- **Protection**: Set up branch protection rules on main
 - Keep Progress Summary and Key Findings sections updated
+
+## Next Steps
+Based on current progress, next recommended action:
+1. Complete remaining task in Phase 1.1 (git hooks setup) in `main`
+2. Create `feature/testing-framework` branch for Phase 1.2
+3. Set up GitHub branch protection rules for `main`
