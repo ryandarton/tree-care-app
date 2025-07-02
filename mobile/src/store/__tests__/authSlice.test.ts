@@ -10,7 +10,6 @@ import authReducer, {
 
 // Define the test store type
 type TestStore = ReturnType<typeof configureStore<{auth: ReturnType<typeof authReducer>}>>;
-type RootState = ReturnType<TestStore['getState']>;
 
 // Mock user data for testing
 const mockUser = {
