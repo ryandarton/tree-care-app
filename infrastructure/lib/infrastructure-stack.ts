@@ -2,6 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 import { RemovalPolicy } from 'aws-cdk-lib';
 
@@ -144,6 +145,100 @@ export class InfrastructureStack extends cdk.Stack {
       });
     }
 
+    // IAM Roles & Policies
+    // Lambda Execution Role
+    const lambdaExecutionRole = new iam.Role(this, 'LambdaExecutionRole', {
+      roleName: `TreeCareLambdaRole-${environment}`,
+      assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
+      description: 'Execution role for Tree Care Lambda functions',
+    });
+
+    // CloudWatch Logs permissions
+    lambdaExecutionRole.addToPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'logs:CreateLogGroup',
+        'logs:CreateLogStream',
+        'logs:PutLogEvents',
+      ],
+      resources: [`arn:aws:logs:${this.region}:${this.account}:log-group:/aws/lambda/*`],
+    }));
+
+    // DynamoDB permissions
+    lambdaExecutionRole.addToPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'dynamodb:GetItem',
+        'dynamodb:PutItem',
+        'dynamodb:UpdateItem',
+        'dynamodb:DeleteItem',
+        'dynamodb:Query',
+        'dynamodb:Scan',
+        'dynamodb:BatchGetItem',
+        'dynamodb:BatchWriteItem',
+      ],
+      resources: [
+        usersTable.tableArn,
+        treesTable.tableArn,
+        photosTable.tableArn,
+        subscriptionsTable.tableArn,
+        `${usersTable.tableArn}/index/*`,
+        `${treesTable.tableArn}/index/*`,
+        `${photosTable.tableArn}/index/*`,
+      ],
+    }));
+
+    // S3 permissions
+    lambdaExecutionRole.addToPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        's3:GetObject',
+        's3:PutObject',
+        's3:DeleteObject',
+        's3:GetObjectVersion',
+      ],
+      resources: [`${photoBucket.bucketArn}/*`],
+    }));
+
+    // S3 bucket permissions (list, etc.)
+    lambdaExecutionRole.addToPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        's3:ListBucket',
+        's3:GetBucketLocation',
+      ],
+      resources: [photoBucket.bucketArn],
+    }));
+
+    // Cognito permissions
+    lambdaExecutionRole.addToPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'cognito-idp:AdminGetUser',
+        'cognito-idp:AdminUpdateUserAttributes',
+        'cognito-idp:AdminConfirmSignUp',
+        'cognito-idp:AdminSetUserPassword',
+      ],
+      resources: [userPool.userPoolArn],
+    }));
+
+    // S3 Bucket Policy - Enforce SSL/TLS
+    photoBucket.addToResourcePolicy(new iam.PolicyStatement({
+      sid: 'DenyInsecureConnections',
+      effect: iam.Effect.DENY,
+      principals: [new iam.AnyPrincipal()],
+      actions: ['s3:*'],
+      resources: [
+        photoBucket.bucketArn,
+        `${photoBucket.bucketArn}/*`,
+      ],
+      conditions: {
+        Bool: {
+          'aws:SecureTransport': 'false',
+        },
+      },
+    }));
+
     // Outputs
     new cdk.CfnOutput(this, 'UserPoolId', {
       value: userPool.userPoolId,
@@ -158,6 +253,11 @@ export class InfrastructureStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'PhotoBucketName', {
       value: photoBucket.bucketName,
       exportName: `TreeCarePhotoBucket-${environment}`,
+    });
+
+    new cdk.CfnOutput(this, 'LambdaExecutionRoleArn', {
+      value: lambdaExecutionRole.roleArn,
+      exportName: `TreeCareLambdaRole-${environment}`,
     });
   }
 }

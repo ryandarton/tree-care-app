@@ -270,4 +270,97 @@ describe('TreeCareInfrastructureStack', () => {
       });
     });
   });
+
+  describe('IAM Roles and Policies', () => {
+    test('creates Lambda execution role', () => {
+      template.hasResourceProperties('AWS::IAM::Role', {
+        AssumeRolePolicyDocument: {
+          Statement: Match.arrayWith([
+            Match.objectLike({
+              Effect: 'Allow',
+              Principal: {
+                Service: 'lambda.amazonaws.com'
+              },
+              Action: 'sts:AssumeRole'
+            })
+          ])
+        }
+      });
+    });
+
+    test('Lambda role has DynamoDB permissions', () => {
+      template.hasResourceProperties('AWS::IAM::Policy', {
+        PolicyDocument: {
+          Statement: Match.arrayWith([
+            Match.objectLike({
+              Effect: 'Allow',
+              Action: Match.arrayWith([
+                'dynamodb:GetItem',
+                'dynamodb:PutItem',
+                'dynamodb:UpdateItem',
+                'dynamodb:DeleteItem',
+                'dynamodb:Query',
+                'dynamodb:Scan'
+              ])
+            })
+          ])
+        }
+      });
+    });
+
+    test('Lambda role has S3 permissions', () => {
+      template.hasResourceProperties('AWS::IAM::Policy', {
+        PolicyDocument: {
+          Statement: Match.arrayWith([
+            Match.objectLike({
+              Effect: 'Allow',
+              Action: Match.arrayWith([
+                's3:GetObject',
+                's3:PutObject',
+                's3:DeleteObject'
+              ])
+            })
+          ])
+        }
+      });
+    });
+
+    test('Lambda role has CloudWatch Logs permissions', () => {
+      template.hasResourceProperties('AWS::IAM::Policy', {
+        PolicyDocument: {
+          Statement: Match.arrayWith([
+            Match.objectLike({
+              Effect: 'Allow',
+              Action: Match.arrayWith([
+                'logs:CreateLogGroup',
+                'logs:CreateLogStream',
+                'logs:PutLogEvents'
+              ])
+            })
+          ])
+        }
+      });
+    });
+
+    test('S3 bucket has secure bucket policy', () => {
+      template.hasResourceProperties('AWS::S3::BucketPolicy', {
+        PolicyDocument: {
+          Statement: Match.arrayWith([
+            Match.objectLike({
+              Effect: 'Deny',
+              Principal: {
+                AWS: '*'
+              },
+              Action: 's3:*',
+              Condition: {
+                Bool: {
+                  'aws:SecureTransport': 'false'
+                }
+              }
+            })
+          ])
+        }
+      });
+    });
+  });
 });
