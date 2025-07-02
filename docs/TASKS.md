@@ -199,25 +199,39 @@ Before each commit:
 - [x] **PR**: Submit PR to main when complete
 
 ### 1.3 AWS Infrastructure as Code
-**Branch**: `feature/aws-infrastructure`
-- [ ] **BRANCH**: Create feature branch from main
+**Branch**: `feature/aws-infrastructure` | **Est. Time**: 12-16 hours | **Status**: 🟡 In Progress
+**Dependencies**: Requires 1.1 & 1.2 completion
+
+#### Task 1: CDK Setup & Core Infrastructure ✅ (6 hours)
+- [x] **BRANCH**: Create feature branch from main
+- [x] **TEST**: Write CDK snapshot tests for stack configuration
+- [x] Initialize AWS CDK project in infrastructure/
+- [x] Create DynamoDB tables (users, trees, photos, subscriptions)
+- [x] Configure S3 buckets for photo storage with lifecycle rules
+- [x] Setup Cognito user pools with MFA
+- [x] **DOCS**: Review and update documentation
+- [x] **COMMIT**: "feat: initialize AWS CDK project"
+
+#### Task 2: Environment Configuration (3 hours)
+- [ ] **TEST**: Write tests for environment-specific configurations
+- [ ] Add staging and production environment configs
+- [ ] **DOCS**: Review and update documentation
+- [ ] **COMMIT**: "feat: add multi-environment support"
+
+#### Task 3: IAM Roles & Policies (4 hours)
+- [ ] **TEST**: Write tests for IAM roles and policies
+- [ ] Create Lambda execution roles
+- [ ] Configure S3 bucket policies for secure access
+- [ ] **DOCS**: Review and update documentation
+- [ ] **COMMIT**: "feat: add IAM roles and policies"
+
+#### Task 4: Deploy to Dev (3 hours)
+- [ ] **TEST**: Write deployment validation tests
+- [ ] Deploy infrastructure to AWS dev environment
+- [ ] Verify all resources are created correctly
+- [ ] **DOCS**: Update deployment documentation
+- [ ] **COMMIT**: "deploy: dev infrastructure"
 - [ ] **PR**: Submit PR to main when complete
-- [ ] **TEST**: Write CDK snapshot tests for stack configuration
-- [ ] Initialize AWS CDK project in infrastructure/
-- [ ] **DOCS**: Review and update documentation
-- [ ] **COMMIT**: "feat: initialize AWS CDK project"
-- [ ] **TEST**: Write tests for DynamoDB table schemas
-- [ ] Create DynamoDB tables (users, trees, photos, subscriptions)
-- [ ] **DOCS**: Review and update documentation
-- [ ] **COMMIT**: "feat: add DynamoDB table definitions"
-- [ ] **TEST**: Write tests for S3 bucket policies
-- [ ] Configure S3 buckets for photo storage with lifecycle rules
-- [ ] **DOCS**: Review and update documentation
-- [ ] **COMMIT**: "feat: configure S3 photo storage"
-- [ ] **TEST**: Write tests for Cognito user pool configuration
-- [ ] Setup Cognito user pools with MFA
-- [ ] **DOCS**: Review and update documentation
-- [ ] **COMMIT**: "feat: add Cognito authentication"
 
 ### 1.4 Backend API Foundation
 **Branch**: `feature/backend-foundation`
