@@ -66,40 +66,8 @@ export const fetchTrees = createAsyncThunk<
     // TODO: Replace with actual API call
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // Simulated successful response
-    return [
-      {
-        id: 'tree-123',
-        userId,
-        name: 'Front Yard Oak',
-        species: {
-          scientificName: 'Quercus rubra',
-          commonName: 'Red Oak',
-          speciesId: 'oak-red',
-        },
-        plantedDate: '2023-01-15',
-        location: {
-          yardPosition: 'front yard',
-          coordinates: [40.7128, -74.0060],
-          sunExposure: 'full sun',
-          soilType: 'clay',
-        },
-        currentStatus: {
-          height: 8.5,
-          trunkDiameter: 3.2,
-          canopySpread: 6.0,
-          healthScore: 85,
-          growthStage: 'juvenile',
-        },
-        goals: {
-          targetHeight: 15,
-          clearanceNeeded: 8,
-          aestheticStyle: 'natural',
-        },
-        createdAt: '2023-01-15T10:30:00Z',
-        updatedAt: '2023-07-02T14:20:00Z',
-      },
-    ];
+    // Simulated successful response - return empty array for now
+    return [];
   } catch (error) {
     return rejectWithValue(error instanceof Error ? error.message : 'Failed to fetch trees');
   }
