@@ -1,0 +1,17 @@
+node_modules
+dist
+build
+coverage
+.expo
+.expo-shared
+ios/build
+android/build
+*.min.js
+infrastructure/*.js
+infrastructure/*.d.ts
+infrastructure/bin/*.js
+infrastructure/lib/*.js
+infrastructure/lib/*.d.ts
+infrastructure/test/*.js
+infrastructure/cdk.out
+cdk.out

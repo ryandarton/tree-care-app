@@ -617,3 +617,27 @@ const trackPhotoAnalysis = async (photoUri) => {
 ```
 
 This development guide ensures consistent, high-quality code across the entire Tree Care App project while maintaining performance, security, and maintainability standards.
+
+## Key Findings & Decisions
+
+### Infrastructure Implementation (Phase 1.3)
+1. **AWS Profile Configuration**: Using `ryan-laptop-goal-app` profile for all AWS operations
+2. **Region Selection**: `us-east-2` chosen as primary region for all resources
+3. **CDK Bootstrap**: Successfully bootstrapped CDK environment (CDKToolkit stack)
+4. **Environment Strategy**: 
+   - Development: DESTROY removal policy for easy cleanup
+   - Production: RETAIN removal policy with PITR and monitoring enabled
+5. **Build Management**: 
+   - CDK generates JS files that should be excluded from git
+   - Added comprehensive .eslintignore configuration for CDK output
+
+### Technical Decisions
+1. **DynamoDB Design**: Using on-demand billing for all tables (cost-effective for startup phase)
+2. **S3 Lifecycle**: 90-day transition to IA storage, 30-day cleanup for old versions
+3. **Cognito MFA**: Set as OPTIONAL to reduce user friction while maintaining security option
+4. **IAM Approach**: Single Lambda execution role with comprehensive permissions for simplicity
+
+### Development Workflow Updates
+1. **CDK Commands**: Added npm scripts for easy deployment (`npm run deploy:dev`)
+2. **Validation Script**: Created infrastructure validation script for post-deployment checks
+3. **Git Strategy**: CDK build artifacts excluded via .gitignore and .eslintignore

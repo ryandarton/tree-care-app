@@ -253,6 +253,50 @@ def create_training_pipeline():
 - API rate limiting per user tier
 - Geographic restrictions where applicable
 
+## Infrastructure as Code
+
+### AWS CDK Stack Architecture
+The entire infrastructure is managed using AWS CDK (TypeScript) for repeatable, version-controlled deployments.
+
+**Stack Components:**
+```typescript
+TreeCareInfrastructure-{environment}
+├── DynamoDB Tables
+│   ├── TreeCareUsers-{env} (PK: userId, GSI: email)
+│   ├── TreeCareTrees-{env} (PK: treeId, SK: userId)
+│   ├── TreeCarePhotos-{env} (PK: photoId, SK: treeId)
+│   └── TreeCareSubscriptions-{env} (PK: userId)
+├── S3 Buckets
+│   └── tree-care-photos-{env}-{accountId}
+│       ├── Versioning: Enabled
+│       ├── Encryption: S3-Managed
+│       ├── Lifecycle Rules: 90d → IA, 30d version cleanup
+│       └── Bucket Policy: SSL/TLS enforced
+├── Cognito
+│   ├── UserPool: TreeCareUserPool-{env}
+│   │   ├── MFA: Optional (SMS + TOTP)
+│   │   └── Password Policy: 8+ chars, mixed case, numbers
+│   └── UserPoolClient: TreeCareMobileApp
+└── IAM
+    └── LambdaExecutionRole: TreeCareLambdaRole-{env}
+        ├── DynamoDB: Full CRUD on all tables
+        ├── S3: GetObject, PutObject, DeleteObject
+        ├── Cognito: Admin operations
+        └── CloudWatch: Logs access
+```
+
+### Environment-Specific Configuration
+- **Development**: DESTROY removal policy, auto-delete enabled
+- **Staging**: Similar to dev with production-like data
+- **Production**: RETAIN removal policy, PITR enabled, contributor insights
+
+### Deployment Commands
+```bash
+npm run deploy:dev    # Deploy to development
+npm run deploy:staging # Deploy to staging
+npm run deploy:prod   # Deploy to production
+```
+
 ## Performance & Scalability
 
 ### Caching Strategy
