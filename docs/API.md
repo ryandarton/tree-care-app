@@ -24,6 +24,27 @@ Content-Type: application/json
 }
 ```
 
+## System Health
+
+### Health Check
+```http
+GET /health
+```
+
+**Description:** Returns the current health status of the API service.
+
+**Authentication:** Not required
+
+**Response:**
+```json
+{
+  "status": "healthy",
+  "environment": "development",
+  "timestamp": "2025-07-01T23:30:00Z",
+  "version": "1.0.0"
+}
+```
+
 ## User Management
 
 ### Get User Profile

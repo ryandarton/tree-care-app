@@ -52,15 +52,24 @@ The Tree Care App uses a serverless-first architecture built entirely on AWS ser
 
 ### Backend API (AWS Lambda + Node.js)
 
+**Lambda Function Architecture:**
+- Async/await pattern for all handlers
+- Structured error handling with consistent response format
+- CORS headers configured for cross-origin requests
+- Rate limiting implemented at API Gateway level
+- Health check endpoint for monitoring
+
 **Lambda Functions:**
 - `analyzePhoto`: Process tree photos with AI models
 - `generateRecommendations`: Create personalized care advice
 - `manageSubscriptions`: Handle Stripe payment events
 - `sendNotifications`: Smart scheduling and reminders
 - `processImages`: Resize and optimize uploaded photos
+- `healthCheck`: Service health monitoring
 
 **API Endpoints:**
 ```
+GET  /health                         # Health check (no auth required)
 POST /api/v1/trees                    # Create new tree profile
 GET  /api/v1/trees/{id}              # Get tree details
 POST /api/v1/photos/analyze          # Analyze tree photo
