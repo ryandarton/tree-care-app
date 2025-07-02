@@ -143,6 +143,16 @@ ai-models/trained-models/*.joblib
 *.tfstate.*
 .terraform/
 
+# CDK
+.cdk.staging
+cdk.out
+infrastructure/cdk.out/
+infrastructure/bin/*.js
+infrastructure/lib/*.js
+infrastructure/lib/*.d.ts
+infrastructure/test/*.js
+infrastructure/test/*.d.ts
+
 # Local development
 .local/
 temp/
