@@ -15,6 +15,9 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:e2e": "detox test",
+    "test:e2e:build": "detox build -c ios.sim.debug",
+    "test:e2e:ios": "detox test -c ios.sim.debug",
+    "test:e2e:android": "detox test -c android.emu.debug",
     "lint": "eslint src/ --ext .js,.jsx,.ts,.tsx",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "type-check": "tsc --noEmit"
