@@ -70,6 +70,23 @@ npm run format      # Prettier format
 npm test           # Run all tests
 ```
 
+### Infrastructure Management
+```bash
+cd infrastructure
+
+# Deployment
+npm run deploy:dev       # Deploy to dev environment
+npm run deploy:staging   # Deploy to staging
+npm run deploy:prod     # Deploy to production
+
+# Validation
+node scripts/validate-deployment.js dev  # Validate deployment
+
+# CDK Commands
+npm run synth           # Synthesize CloudFormation
+npm run diff            # Show deployment changes
+```
+
 ## Key Implementation Details
 
 ### Mobile App State Management
