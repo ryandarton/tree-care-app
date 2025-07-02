@@ -3,6 +3,8 @@ import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as apigateway from 'aws-cdk-lib/aws-apigateway';
+import * as logs from 'aws-cdk-lib/aws-logs';
 import { Construct } from 'constructs';
 import { RemovalPolicy } from 'aws-cdk-lib';
 
@@ -239,6 +241,171 @@ export class InfrastructureStack extends cdk.Stack {
       },
     }));
 
+    // API Gateway
+    const api = new apigateway.RestApi(this, 'TreeCareAPI', {
+      restApiName: `TreeCareAPI-${environment}`,
+      description: 'Tree Care App API Gateway',
+      deployOptions: {
+        stageName: environment,
+        loggingLevel: apigateway.MethodLoggingLevel.INFO,
+        dataTraceEnabled: true,
+        metricsEnabled: true,
+        accessLogDestination: new apigateway.LogGroupLogDestination(
+          new logs.LogGroup(this, 'ApiGatewayLogGroup', {
+            logGroupName: `/aws/apigateway/TreeCareAPI-${environment}`,
+            retention: logs.RetentionDays.ONE_WEEK,
+            removalPolicy: isProd ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY,
+          })
+        ),
+        accessLogFormat: apigateway.AccessLogFormat.jsonWithStandardFields(),
+        throttlingBurstLimit: 5000,
+        throttlingRateLimit: 2000,
+      },
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: apigateway.Cors.ALL_METHODS,
+        allowHeaders: ['Content-Type', 'X-Amz-Date', 'Authorization', 'X-Api-Key', 'X-Amz-Security-Token'],
+        maxAge: cdk.Duration.days(1),
+      },
+      policy: new iam.PolicyDocument({
+        statements: [
+          new iam.PolicyStatement({
+            effect: iam.Effect.ALLOW,
+            principals: [new iam.AnyPrincipal()],
+            actions: ['execute-api:Invoke'],
+            resources: ['*'],
+          }),
+        ],
+      }),
+    });
+
+    // Request Validators
+    new apigateway.RequestValidator(this, 'RequestValidator', {
+      restApi: api,
+      requestValidatorName: `TreeCareRequestValidator-${environment}`,
+      validateRequestBody: true,
+      validateRequestParameters: true,
+    });
+
+    // Models for request validation
+    new apigateway.Model(this, 'TreeModel', {
+      restApi: api,
+      modelName: 'TreeModel',
+      contentType: 'application/json',
+      schema: {
+        type: apigateway.JsonSchemaType.OBJECT,
+        required: ['treeId'],
+        properties: {
+          treeId: { type: apigateway.JsonSchemaType.STRING },
+          species: { type: apigateway.JsonSchemaType.STRING },
+          location: {
+            type: apigateway.JsonSchemaType.OBJECT,
+            properties: {
+              lat: { type: apigateway.JsonSchemaType.NUMBER },
+              lng: { type: apigateway.JsonSchemaType.NUMBER },
+            },
+          },
+        },
+      },
+    });
+
+    // Custom Gateway Responses
+    api.addGatewayResponse('Default4XX', {
+      type: apigateway.ResponseType.DEFAULT_4XX,
+      responseHeaders: {
+        'Access-Control-Allow-Origin': "'*'",
+      },
+      templates: {
+        'application/json': '{"error": "$context.error.message", "requestId": "$context.requestId"}',
+      },
+    });
+
+    api.addGatewayResponse('Default5XX', {
+      type: apigateway.ResponseType.DEFAULT_5XX,
+      responseHeaders: {
+        'Access-Control-Allow-Origin': "'*'",
+      },
+      templates: {
+        'application/json': '{"error": "Internal server error", "requestId": "$context.requestId"}',
+      },
+    });
+
+    // Usage Plans
+    // Free tier usage plan
+    const freeUsagePlan = new apigateway.UsagePlan(this, 'FreeUsagePlan', {
+      name: `TreeCareFreeUsagePlan-${environment}`,
+      description: 'Usage plan for free tier users',
+      throttle: {
+        burstLimit: 1000,
+        rateLimit: 100,
+      },
+      quota: {
+        limit: 10000,
+        period: apigateway.Period.MONTH,
+      },
+    });
+
+    // Premium tier usage plan
+    const premiumUsagePlan = new apigateway.UsagePlan(this, 'PremiumUsagePlan', {
+      name: `TreeCarePremiumUsagePlan-${environment}`,
+      description: 'Usage plan for premium tier users',
+      throttle: {
+        burstLimit: 10000,
+        rateLimit: 5000,
+      },
+      quota: {
+        limit: 10000000,
+        period: apigateway.Period.MONTH,
+      },
+    });
+
+    // API Keys
+    const freeApiKey = new apigateway.ApiKey(this, 'FreeApiKey', {
+      apiKeyName: `TreeCareFreeKey-${environment}`,
+      description: 'API key for free tier users',
+      enabled: true,
+    });
+
+    const premiumApiKey = new apigateway.ApiKey(this, 'PremiumApiKey', {
+      apiKeyName: `TreeCarePremiumKey-${environment}`,
+      description: 'API key for premium tier users',
+      enabled: true,
+    });
+
+    // Associate API keys with usage plans
+    freeUsagePlan.addApiKey(freeApiKey);
+    premiumUsagePlan.addApiKey(premiumApiKey);
+
+    // Add API stages to usage plans
+    freeUsagePlan.addApiStage({
+      stage: api.deploymentStage,
+    });
+
+    premiumUsagePlan.addApiStage({
+      stage: api.deploymentStage,
+    });
+
+    // Default usage plan (no API key required)
+    const defaultUsagePlan = new apigateway.UsagePlan(this, 'DefaultUsagePlan', {
+      name: `TreeCareUsagePlan-${environment}`,
+      description: 'Usage plan for Tree Care API',
+      throttle: {
+        burstLimit: 5000,
+        rateLimit: 2000,
+      },
+      quota: {
+        limit: 1000000,
+        period: apigateway.Period.MONTH,
+      },
+    });
+
+    defaultUsagePlan.addApiStage({
+      stage: api.deploymentStage,
+    });
+
+    // Tag the API stage for WAF
+    cdk.Tags.of(api.deploymentStage).add('WAF', 'Enabled');
+
     // Outputs
     new cdk.CfnOutput(this, 'UserPoolId', {
       value: userPool.userPoolId,
@@ -258,6 +425,16 @@ export class InfrastructureStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'LambdaExecutionRoleArn', {
       value: lambdaExecutionRole.roleArn,
       exportName: `TreeCareLambdaRole-${environment}`,
+    });
+
+    new cdk.CfnOutput(this, 'ApiGatewayUrl', {
+      value: api.url,
+      exportName: `TreeCareApiUrl-${environment}`,
+    });
+
+    new cdk.CfnOutput(this, 'ApiGatewayRestApiId', {
+      value: api.restApiId,
+      exportName: `TreeCareApiId-${environment}`,
     });
   }
 }
