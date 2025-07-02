@@ -36,7 +36,7 @@ tree-care-app/
 - **Phase 2: Mobile App Foundation** - 🚀 40% Complete (July 2025)
   - ✅ Redux store setup (auth slice, trees slice, persistence) - COMPLETE
   - ✅ Navigation structure (React Navigation with auth guards) - COMPLETE
-  - 🔄 Core UI components (Button, Input, Card - next up)
+  - 🔄 Core UI components - IN PROGRESS (Button, Input, Card components)
   - ⏳ Authentication flow
   - ⏳ Tree management screens
 
