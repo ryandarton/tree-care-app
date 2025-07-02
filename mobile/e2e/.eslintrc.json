@@ -1,0 +1,12 @@
+{
+  "globals": {
+    "device": true,
+    "element": true,
+    "by": true,
+    "waitFor": true,
+    "expect": true
+  },
+  "env": {
+    "jest": true
+  }
+}

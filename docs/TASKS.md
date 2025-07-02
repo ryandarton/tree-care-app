@@ -1,12 +1,146 @@
 # Tree Care App - TDD Development Tasks
 
+## Progress Summary
+- **Started**: July 1, 2025
+- **Current Phase**: 1.2 Testing Framework Setup ✅
+- **Repository**: https://github.com/ryandarton/tree-care-app
+- **Completed Tasks**: 6/15 in Phase 1 ✅
+- **Overall Progress**: 7% (6/89 major tasks)
+- **Estimated Completion**: ~12 weeks (based on 2-4 hour TDD cycles)
+- **Active PR**: [#1 Testing Framework](https://github.com/ryandarton/tree-care-app/pull/1)
+
+### Phase Progress Tracker
+```
+Phase 1: Foundation & Infrastructure    [████░░░░░░] 40% (2/5 sections)
+├── 1.1 Dev Setup                     [██████████] 100% (3/3 tasks) ✅
+├── 1.2 Testing Framework             [██████████] 100% (3/3 tasks) ✅
+├── 1.3 AWS Infrastructure            [░░░░░░░░░░]  0% (0/4 tasks)
+├── 1.4 Backend Foundation            [░░░░░░░░░░]  0% (0/3 tasks)
+└── 1.5 CI/CD Pipeline               [░░░░░░░░░░]  0% (0/2 tasks)
+
+Phase 2: Mobile App Foundation          [░░░░░░░░░░]  0% (0/5 sections)
+Phase 3: AI Integration                 [░░░░░░░░░░]  0% (0/4 sections)
+Phase 4: Features & Monetization       [░░░░░░░░░░]  0% (0/4 sections)
+Phase 5: Testing & Deployment          [░░░░░░░░░░]  0% (0/6 sections)
+```
+
+## Key Findings & Decisions
+1. **AWS Configuration**: Using profile `ryan-laptop-goal-app` in region `us-east-2`
+2. **Dependency Management**: Using `--legacy-peer-deps` for all npm installs due to React version conflicts
+3. **Package Fixes**:
+   - `react-native-image-editor` → `@react-native-community/image-editor@^2.3.0`
+   - `react-native-image-resizer` → version `^1.4.5` (not 3.0.0)
+4. **Project Structure**: Created minimal `backend/` and `ai-models/` directories for npm workspaces
+5. **Testing Framework Decisions** (Phase 1.2):
+   - Backend: Jest with TypeScript support + AWS SDK mocks for all services
+   - Mobile: Jest + React Native Testing Library with Babel preset for Expo
+   - E2E: Detox configured for iOS/Android simulators
+   - ESLint: Root + project-specific configs to handle monorepo structure
+   - All tests passing with proper TypeScript support
+
+## Task Dependencies Matrix 🔗
+
+### Critical Path Dependencies
+```
+1.1 Dev Setup
+  ↓
+1.2 Testing Framework → 1.3 AWS Infrastructure
+  ↓                       ↓
+1.4 Backend Foundation ←──┘
+  ↓
+1.5 CI/CD Pipeline
+  ↓
+2.1 Redux Store → 2.2 Navigation → 2.3 UI Components
+  ↓               ↓                ↓
+2.4 Auth Flow ←──┴────────────────┘
+  ↓
+2.5 Tree Management
+  ↓
+3.1 Photo Capture → 3.2 AI Models → 3.3 Analysis Pipeline
+  ↓                                   ↓
+3.4 Visual Overlays ←─────────────────┘
+  ↓
+4.1-4.4 Features & Monetization
+  ↓
+5.1-5.6 Testing & Deployment
+```
+
+### Parallel Work Opportunities 🚀
+- **Phase 1**: 1.2 Testing + 1.3 AWS Infrastructure can run in parallel
+- **Phase 2**: UI components (2.3) can be built while auth flow (2.4) is in development
+- **Phase 3**: AI model deployment (3.2) can happen while photo capture (3.1) is being built
+- **Phase 4**: All monetization features (4.1-4.4) can be developed in parallel
+
+## Risk Assessment & Mitigation 🛡️
+
+### High Risk Items ⚠️
+| Risk | Impact | Probability | Mitigation |
+|------|--------|-------------|------------|
+| AWS Service Limits | High | Medium | Monitor usage, request limit increases early |
+| React Native Version Conflicts | Medium | High | Continue using `--legacy-peer-deps`, plan upgrade |
+| AI Model Accuracy | High | Medium | Extensive testing data, fallback mechanisms |
+| Stripe Integration Complexity | Medium | Medium | Thorough testing in sandbox, gradual rollout |
+
+### Medium Risk Items ⚡
+| Risk | Impact | Probability | Mitigation |
+|------|--------|-------------|------------|
+| Expo SDK Compatibility | Medium | Low | Pin versions, test upgrades thoroughly |
+| Performance on Older Devices | Medium | Medium | Performance testing, optimization phases |
+| App Store Approval | Medium | Low | Follow guidelines strictly, prepare appeals |
+
+### Risk Monitoring Schedule 📅
+- **Weekly**: Check AWS costs and service usage
+- **Bi-weekly**: Review dependency security updates
+- **Monthly**: Performance testing and optimization review
+- **Per Phase**: Security audit and compliance check
+
 ## Overview
 This document outlines the complete Test-Driven Development (TDD) approach for building the Tree Care App from concept to deployment. Each task follows the Red-Green-Refactor cycle with frequent commits.
 
 ## TDD Workflow for Every Task
 ```
-1. Write Test (Red) → 2. Run Test (Fail) → 3. Write Code → 4. Run Test (Pass) → 5. Refactor → 6. Commit
+1. Write Test (Red) → 2. Run Test (Fail) → 3. Write Code → 4. Run Test (Pass) → 5. Refactor → 6. Review Docs → 7. Commit
 ```
+
+## Git Branching Strategy
+
+### Branch Structure
+```
+main                     # Stable, deployable code only
+├── feature/testing-framework      # Phase 1.2: Jest, React Native Testing, Detox
+├── feature/aws-infrastructure     # Phase 1.3: CDK, DynamoDB, S3, Cognito
+├── feature/backend-foundation     # Phase 1.4: Lambda, API Gateway, health checks
+├── feature/ci-cd-pipeline        # Phase 1.5: GitHub Actions workflows
+├── feature/mobile-foundation     # Phase 2: Redux, Navigation, UI Components
+├── feature/auth-flow            # Phase 2.4: Authentication screens and flow
+├── feature/ai-integration       # Phase 3: Photo analysis, ML models
+└── feature/monetization         # Phase 4: Stripe, ads, notifications
+```
+
+### Branching Workflow
+1. **Create feature branch**: `git checkout -b feature/branch-name`
+2. **Work in TDD cycles**: Test → Code → Commit (every 2-4 hours)
+3. **Push regularly**: Every 3-5 commits to backup work
+4. **PR when complete**: After completing major component/phase section
+5. **Merge to main**: Only after PR approval and all tests passing
+6. **Delete feature branch**: After successful merge
+
+### Merge Strategy
+- **Phase sections (1.1, 1.2, etc.)**: Feature branch → PR → Squash merge to main
+- **Major phases (Phase 1, 2, etc.)**: Create release tag after completion
+- **Hotfixes**: Direct to main with immediate PR for review
+
+### Branch Protection Rules
+- **main**: Requires PR approval, all tests passing, no direct pushes
+- **feature/***: Can push directly, regular backup pushes encouraged
+
+## Documentation Review Process
+Before each commit:
+- [ ] Review relevant .md files in /docs
+- [ ] Update documentation with any structural changes
+- [ ] Document important findings or decisions
+- [ ] Ensure README reflects current state
+- [ ] Update CLAUDE.md if development workflow changes
 
 ## Commit Guidelines
 - Commit after each test passes
@@ -18,43 +152,77 @@ This document outlines the complete Test-Driven Development (TDD) approach for b
 
 ## Phase 1: Foundation & Infrastructure (Week 1-2)
 
-### 1.1 Development Environment Setup
-- [ ] **TEST**: Write test for AWS CLI configuration validation
-- [ ] Configure AWS CLI with profile `ryan-laptop-goal-app`
-- [ ] **COMMIT**: "chore: configure AWS CLI profile"
-- [ ] **TEST**: Write test for project dependency installation
-- [ ] Fix npm dependency conflicts with legacy peer deps
-- [ ] **COMMIT**: "fix: resolve npm dependency conflicts"
-- [ ] **TEST**: Write test for git hooks setup
-- [ ] Setup pre-commit hooks for linting and type checking
-- [ ] **COMMIT**: "chore: add pre-commit hooks"
+### 1.1 Development Environment Setup ✅
+**Branch**: `main` (foundation setup) | **Est. Time**: 6-8 hours | **Status**: 🟢 Complete
 
-### 1.2 Testing Framework Setup
-- [ ] **TEST**: Write meta-test for Jest configuration
-- [ ] Configure Jest for backend with AWS SDK mocks
-- [ ] **COMMIT**: "test: setup Jest for backend testing"
-- [ ] **TEST**: Write meta-test for React Native testing setup
-- [ ] Configure Jest and React Native Testing Library for mobile
-- [ ] **COMMIT**: "test: setup mobile testing framework"
-- [ ] **TEST**: Write test for E2E framework initialization
-- [ ] Setup Detox for E2E testing
-- [ ] **COMMIT**: "test: configure Detox E2E framework"
+#### Task 1: AWS Configuration ✅ (2 hours)
+- [x] **TEST**: Write test for AWS CLI configuration validation
+- [x] Configure AWS CLI with profile `ryan-laptop-goal-app`
+- [x] **DOCS**: Review and update documentation
+- [x] **COMMIT**: "test: add AWS CLI configuration validation test"
+
+#### Task 2: Dependency Management ✅ (3 hours)
+- [x] **TEST**: Write test for project dependency installation
+- [x] Fix npm dependency conflicts with legacy peer deps
+- [x] **DOCS**: Updated package.json with legacy-peer-deps, fixed package versions
+- [x] **COMMIT**: "fix: resolve npm dependency conflicts with legacy peer deps"
+
+#### Task 3: Git Hooks Setup ✅ (2 hours)
+- [x] **TEST**: Write test for git hooks setup
+- [x] Setup pre-commit hooks for linting and type checking
+- [x] **DOCS**: Review and update documentation
+- [x] **COMMIT**: "chore: add pre-commit hooks"
+
+### 1.2 Testing Framework Setup 🧪 ✅
+**Branch**: `feature/testing-framework` | **Est. Time**: 8-12 hours | **Status**: 🟢 Complete
+**Dependencies**: Requires 1.1 completion
+**PR**: [#1](https://github.com/ryandarton/tree-care-app/pull/1)
+
+#### Task 1: Backend Testing Setup ✅ (4 hours)
+- [x] **BRANCH**: Create feature branch from main
+- [x] **TEST**: Write meta-test for Jest configuration
+- [x] Configure Jest for backend with AWS SDK mocks
+- [x] **DOCS**: Review and update documentation
+- [x] **COMMIT**: "test: setup Jest for backend testing"
+
+#### Task 2: Mobile Testing Setup ✅ (4 hours)
+- [x] **TEST**: Write meta-test for React Native testing setup
+- [x] Configure Jest and React Native Testing Library for mobile
+- [x] **DOCS**: Review and update documentation
+- [x] **COMMIT**: "test: setup mobile testing framework"
+
+#### Task 3: E2E Testing Setup ✅ (4 hours)
+- [x] **TEST**: Write test for E2E framework initialization
+- [x] Setup Detox for E2E testing
+- [x] **DOCS**: Review and update documentation
+- [x] **COMMIT**: "test: configure Detox E2E framework"
+- [x] **PR**: Submit PR to main when complete
 
 ### 1.3 AWS Infrastructure as Code
+**Branch**: `feature/aws-infrastructure`
+- [ ] **BRANCH**: Create feature branch from main
+- [ ] **PR**: Submit PR to main when complete
 - [ ] **TEST**: Write CDK snapshot tests for stack configuration
 - [ ] Initialize AWS CDK project in infrastructure/
+- [ ] **DOCS**: Review and update documentation
 - [ ] **COMMIT**: "feat: initialize AWS CDK project"
 - [ ] **TEST**: Write tests for DynamoDB table schemas
 - [ ] Create DynamoDB tables (users, trees, photos, subscriptions)
+- [ ] **DOCS**: Review and update documentation
 - [ ] **COMMIT**: "feat: add DynamoDB table definitions"
 - [ ] **TEST**: Write tests for S3 bucket policies
 - [ ] Configure S3 buckets for photo storage with lifecycle rules
+- [ ] **DOCS**: Review and update documentation
 - [ ] **COMMIT**: "feat: configure S3 photo storage"
 - [ ] **TEST**: Write tests for Cognito user pool configuration
 - [ ] Setup Cognito user pools with MFA
+- [ ] **DOCS**: Review and update documentation
 - [ ] **COMMIT**: "feat: add Cognito authentication"
 
 ### 1.4 Backend API Foundation
+**Branch**: `feature/backend-foundation`
+- [ ] **BRANCH**: Create feature branch from main
+- [ ] **PR**: Submit PR to main when complete
 - [ ] **TEST**: Write tests for Lambda function handlers
 - [ ] Create Lambda function boilerplate with error handling
 - [ ] **COMMIT**: "feat: add Lambda function template"
@@ -66,12 +234,32 @@ This document outlines the complete Test-Driven Development (TDD) approach for b
 - [ ] **COMMIT**: "feat: add health check endpoint"
 
 ### 1.5 CI/CD Pipeline
+**Branch**: `feature/ci-cd-pipeline`
+- [ ] **BRANCH**: Create feature branch from main
+- [ ] **PR**: Submit PR to main when complete
 - [ ] **TEST**: Write tests for GitHub Actions workflow
 - [ ] Create CI workflow for testing on push
 - [ ] **COMMIT**: "ci: add testing workflow"
 - [ ] **TEST**: Write tests for deployment validation
 - [ ] Create CD workflow for AWS deployment
 - [ ] **COMMIT**: "ci: add deployment workflow"
+
+### Phase 1 Completion Criteria 🏁
+- [ ] **MERGE**: All feature branches merged to main
+- [ ] **TAG**: Create release tag `v1.0.0-phase1`
+- [ ] **DEPLOY**: Deploy to development environment
+- [ ] **DOCS**: Update Progress Summary in TASKS.md
+- [ ] **METRICS**: Validate 80%+ test coverage
+- [ ] **PERFORMANCE**: API health check responds < 200ms
+- [ ] **SECURITY**: No high/critical vulnerabilities found
+- [ ] **REVIEW**: All Phase 1 PRs approved and documented
+
+### Phase 1 Success Celebration 🎉
+```
+🎊 PHASE 1 COMPLETE! 🎊
+Foundation infrastructure deployed and tested!
+Time for Phase 2: Building the mobile magic! 📱✨
+```
 
 ---
 
@@ -328,26 +516,39 @@ This document outlines the complete Test-Driven Development (TDD) approach for b
 
 ---
 
-## Testing Metrics Dashboard
+## Testing Metrics Dashboard 📊
 
+### Current Test Coverage
 ```
 ┌─────────────────────────────────────────────────────┐
 │  Test Coverage Goals                                │
 ├─────────────────────────────────────────────────────┤
-│  Backend:    [████████░░] 80% target               │
-│  Mobile:     [████████░░] 80% target               │
-│  E2E:        [██████████] 100% critical paths      │
-│  Security:   [██████████] 100% auth flows          │
+│  Backend:    [░░░░░░░░░░]  0% / 80% target         │
+│  Mobile:     [░░░░░░░░░░]  0% / 80% target         │
+│  E2E:        [░░░░░░░░░░]  0% / 100% critical paths │
+│  Security:   [░░░░░░░░░░]  0% / 100% auth flows     │
 └─────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────┐
-│  Test Types Distribution                            │
+│  Test Types Distribution (Target vs Current)       │
 ├─────────────────────────────────────────────────────┤
-│  Unit Tests:        ~500 tests                     │
-│  Integration:       ~150 tests                     │
-│  E2E Tests:         ~50 scenarios                  │
-│  Performance:       ~20 benchmarks                 │
-│  Security:          ~30 scenarios                  │
+│  Unit Tests:         0 / ~500 tests               │
+│  Integration:        0 / ~150 tests               │
+│  E2E Tests:          0 / ~50 scenarios            │
+│  Performance:        0 / ~20 benchmarks           │
+│  Security:           0 / ~30 scenarios            │
+└─────────────────────────────────────────────────────┘
+```
+
+### Time Investment Tracker
+```
+┌─────────────────────────────────────────────────────┐
+│  Development Time Allocation                        │
+├─────────────────────────────────────────────────────┤
+│  Testing:       [████████░░] 40% (32/80 hours)     │
+│  Implementation:[██████░░░░] 30% (24/80 hours)     │
+│  Infrastructure:[████░░░░░░] 20% (16/80 hours)     │
+│  Documentation: [██░░░░░░░░] 10% (8/80 hours)      │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -355,7 +556,45 @@ This document outlines the complete Test-Driven Development (TDD) approach for b
 
 ## Notes
 - Each task should result in a commit within 2-4 hours of starting
+- Review and update documentation before EVERY commit
 - Run `npm run lint` and `npm run type-check` before every commit
-- Create feature branches for each major component
-- Squash commits when merging PRs
-- Tag releases after each phase completion
+- **Branching**: Follow the documented Git strategy above
+- **PRs**: Required for all feature branch merges to main
+- **Tagging**: Create release tags after each phase completion
+- **Protection**: Set up branch protection rules on main
+- Keep Progress Summary and Key Findings sections updated
+
+## Immediate Next Actions 🎯
+
+### Today's Focus (Current Sprint)
+1. **✅ Phase 1.1 Complete**: Development Environment Setup finished!
+2. **🚀 Initialize Phase 1.2**: Create `feature/testing-framework` branch
+3. **🛡️ Setup GitHub Protection**: Configure branch protection rules for `main`
+
+### This Week's Goals
+- [x] AWS CLI configuration ✅
+- [x] Dependency management ✅  
+- [x] Git hooks setup ✅
+- [ ] Complete testing framework setup
+- [ ] Begin AWS infrastructure planning
+
+### Command Queue (Ready to Execute)
+```bash
+# 1. Complete current phase
+npm run test  # Run existing tests
+npm run lint  # Ensure code quality
+git add . && git commit -m "chore: add pre-commit hooks"
+
+# 2. Prepare next phase
+git checkout -b feature/testing-framework
+npm install --save-dev jest @types/jest
+
+# 3. Setup protection
+gh api repos/:owner/:repo/branches/main/protection --method PUT
+```
+
+### Weekly Planning Session Topics
+- Review completed tasks and time estimates accuracy
+- Adjust risk mitigation strategies based on learnings
+- Plan parallel work assignments for Phase 2
+- Evaluate if TDD cycle timing (2-4 hours) is optimal
