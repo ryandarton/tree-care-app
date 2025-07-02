@@ -129,3 +129,11 @@ Four custom models process tree photos:
 - Backend: Jest with AWS SDK mocks
 - AI Models: Python pytest with TensorFlow test utils
 - Integration: Postman collections for API testing
+
+## Documentation Review Process
+Before each commit:
+- [ ] Review relevant .md files in /docs
+- [ ] Update documentation with any structural changes
+- [ ] Document important findings or decisions
+- [ ] Ensure README reflects current state
+- [ ] Update CLAUDE.md if development workflow changes

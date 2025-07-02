@@ -10,6 +10,7 @@ export class InfrastructureStack extends cdk.Stack {
     super(scope, id, props);
 
     const environment = this.node.tryGetContext('environment') || 'dev';
+    const isProd = environment === 'prod';
 
     // Stack Tags
     cdk.Tags.of(this).add('Application', 'TreeCareApp');
@@ -20,7 +21,8 @@ export class InfrastructureStack extends cdk.Stack {
       tableName: `TreeCareUsers-${environment}`,
       partitionKey: { name: 'userId', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      removalPolicy: RemovalPolicy.DESTROY, // For dev environments
+      removalPolicy: isProd ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY,
+      pointInTimeRecoverySpecification: isProd ? { pointInTimeRecoveryEnabled: true } : undefined,
     });
 
     // Add GSI for email lookup
@@ -34,7 +36,8 @@ export class InfrastructureStack extends cdk.Stack {
       partitionKey: { name: 'treeId', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'userId', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      removalPolicy: RemovalPolicy.DESTROY,
+      removalPolicy: isProd ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY,
+      pointInTimeRecoverySpecification: isProd ? { pointInTimeRecoveryEnabled: true } : undefined,
     });
 
     const photosTable = new dynamodb.Table(this, 'PhotosTable', {
@@ -42,14 +45,16 @@ export class InfrastructureStack extends cdk.Stack {
       partitionKey: { name: 'photoId', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'treeId', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      removalPolicy: RemovalPolicy.DESTROY,
+      removalPolicy: isProd ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY,
+      pointInTimeRecoverySpecification: isProd ? { pointInTimeRecoveryEnabled: true } : undefined,
     });
 
     const subscriptionsTable = new dynamodb.Table(this, 'SubscriptionsTable', {
       tableName: `TreeCareSubscriptions-${environment}`,
       partitionKey: { name: 'userId', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      removalPolicy: RemovalPolicy.DESTROY,
+      removalPolicy: isProd ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY,
+      pointInTimeRecoverySpecification: isProd ? { pointInTimeRecoveryEnabled: true } : undefined,
     });
 
     // S3 Bucket for photo storage
@@ -58,8 +63,8 @@ export class InfrastructureStack extends cdk.Stack {
       versioned: true,
       encryption: s3.BucketEncryption.S3_MANAGED,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-      removalPolicy: RemovalPolicy.DESTROY,
-      autoDeleteObjects: true, // For dev environments
+      removalPolicy: isProd ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY,
+      autoDeleteObjects: !isProd, // Only for non-prod environments
       lifecycleRules: [
         {
           id: 'delete-old-versions',
@@ -100,7 +105,7 @@ export class InfrastructureStack extends cdk.Stack {
         requireSymbols: false,
       },
       accountRecovery: cognito.AccountRecovery.EMAIL_ONLY,
-      removalPolicy: RemovalPolicy.DESTROY,
+      removalPolicy: isProd ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY,
       standardAttributes: {
         email: {
           required: true,
@@ -127,6 +132,17 @@ export class InfrastructureStack extends cdk.Stack {
       accessTokenValidity: cdk.Duration.hours(1),
       idTokenValidity: cdk.Duration.hours(1),
     });
+
+    // Enable contributor insights for production tables
+    if (isProd) {
+      const tables = [usersTable, treesTable, photosTable, subscriptionsTable];
+      tables.forEach((table) => {
+        const cfnTable = table.node.defaultChild as dynamodb.CfnTable;
+        cfnTable.contributorInsightsSpecification = {
+          enabled: true,
+        };
+      });
+    }
 
     // Outputs
     new cdk.CfnOutput(this, 'UserPoolId', {

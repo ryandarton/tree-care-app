@@ -199,4 +199,75 @@ describe('TreeCareInfrastructureStack', () => {
       });
     });
   });
+
+  describe('Environment-Specific Configuration', () => {
+    test('dev environment uses DESTROY removal policy', () => {
+      const devApp = new cdk.App({ context: { environment: 'dev' } });
+      const devStack = new TreeCareInfrastructure.InfrastructureStack(devApp, 'DevStack');
+      const devTemplate = Template.fromStack(devStack);
+
+      // Check DynamoDB tables have DESTROY policy
+      devTemplate.hasResource('AWS::DynamoDB::Table', {
+        UpdateReplacePolicy: 'Delete',
+        DeletionPolicy: 'Delete'
+      });
+
+      // Check S3 bucket has auto-delete objects
+      devTemplate.hasResource('Custom::S3AutoDeleteObjects', {
+        Type: 'Custom::S3AutoDeleteObjects'
+      });
+    });
+
+    test('staging environment has different table names', () => {
+      const stagingApp = new cdk.App({ context: { environment: 'staging' } });
+      const stagingStack = new TreeCareInfrastructure.InfrastructureStack(stagingApp, 'StagingStack');
+      const stagingTemplate = Template.fromStack(stagingStack);
+
+      stagingTemplate.hasResourceProperties('AWS::DynamoDB::Table', {
+        TableName: 'TreeCareUsers-staging'
+      });
+
+      stagingTemplate.hasResourceProperties('AWS::DynamoDB::Table', {
+        TableName: 'TreeCareTrees-staging'
+      });
+    });
+
+    test('prod environment has RETAIN removal policy', () => {
+      const prodApp = new cdk.App({ context: { environment: 'prod' } });
+      const prodStack = new TreeCareInfrastructure.InfrastructureStack(prodApp, 'ProdStack');
+      const prodTemplate = Template.fromStack(prodStack);
+
+      // Check DynamoDB tables have RETAIN policy
+      prodTemplate.hasResource('AWS::DynamoDB::Table', {
+        UpdateReplacePolicy: 'Retain',
+        DeletionPolicy: 'Retain'
+      });
+    });
+
+    test('prod environment has backup configuration', () => {
+      const prodApp = new cdk.App({ context: { environment: 'prod' } });
+      const prodStack = new TreeCareInfrastructure.InfrastructureStack(prodApp, 'ProdStack');
+      const prodTemplate = Template.fromStack(prodStack);
+
+      // Check DynamoDB tables have point-in-time recovery
+      prodTemplate.hasResourceProperties('AWS::DynamoDB::Table', {
+        PointInTimeRecoverySpecification: {
+          PointInTimeRecoveryEnabled: true
+        }
+      });
+    });
+
+    test('prod environment has enhanced monitoring', () => {
+      const prodApp = new cdk.App({ context: { environment: 'prod' } });
+      const prodStack = new TreeCareInfrastructure.InfrastructureStack(prodApp, 'ProdStack');
+      const prodTemplate = Template.fromStack(prodStack);
+
+      // Check DynamoDB tables have contributor insights
+      prodTemplate.hasResourceProperties('AWS::DynamoDB::Table', {
+        ContributorInsightsSpecification: {
+          Enabled: true
+        }
+      });
+    });
+  });
 });
